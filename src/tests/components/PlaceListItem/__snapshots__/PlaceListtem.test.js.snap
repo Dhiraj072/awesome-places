@@ -8,13 +8,24 @@ exports[`PlaceListItem should render correctly 1`] = `
   <View
     style={
       Object {
+        "alignItems": "center",
         "backgroundColor": "#eee",
+        "flexDirection": "row",
         "marginBottom": 5,
         "padding": 10,
         "width": "100%",
       }
     }
   >
+    <Image
+      style={
+        Object {
+          "height": 30,
+          "marginRight": 8,
+          "width": 30,
+        }
+      }
+    />
     <Text
       accessible={true}
       allowFontScaling={true}

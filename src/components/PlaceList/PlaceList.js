@@ -9,7 +9,8 @@ export default (props) => (
         renderItem={(info) => (
             <PlaceListItem
                 name={info.item.name}
-                onPlaceListItemPress={() => props.onPlaceListItemPress(info.item.key)}
+                onPlaceListItemPress={() => props.onPlaceListItemPress(info.item)}
+                placeImage={info.item.image}
             />)}
     />
 );
