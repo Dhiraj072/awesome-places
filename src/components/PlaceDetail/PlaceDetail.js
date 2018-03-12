@@ -15,15 +15,13 @@ export default (props) => (
             />
             <Text style={styles.text}>{props.place ? props.place.name : ''}</Text>
             <View>
-                <Button
-                    title="Delete"
-                    color="red"
-                    onPress={props.handleDeletePlace}
-                />
-                {/* <Icon
-                    name="ios-trash"
-                    color="red"
-                /> */}
+                <View style={styles.button}>
+                    <Icon
+                        size={30}
+                        name="ios-trash"
+                        color="red"
+                    />
+                </View>
                 <Button
                     title="Close"
                     onPress={props.handleModalClose}
@@ -45,5 +43,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 28,
         textAlign: 'center',
+    },
+    button: {
+        alignItems: 'center',
     },
 });
