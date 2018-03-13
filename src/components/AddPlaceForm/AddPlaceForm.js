@@ -16,7 +16,14 @@ export default class AddPlaceForm extends React.Component {
         if (this.state.placeName.trim() === '') {
             return;
         }
-        this.props.placeSubmitHandler(this.state.placeName);
+        const place = {
+            key: Math.random(),
+            name: this.state.placeName,
+            image: {
+                uri: 'https://images.pexels.com/photos/189349/pexels-photo-189349.jpeg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb',
+            },
+        };
+        this.props.placeSubmitHandler(place);
         this.setState(() => ({ placeName: '' }));
     };
 
