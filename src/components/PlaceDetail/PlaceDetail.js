@@ -15,11 +15,13 @@ export default (props) => (
                     size={30}
                     name="ios-trash"
                     color="red"
+                    onPress={props.handleDeletePlace}
                 />
             </View>
         </View>
     </View>
 );
+
 
 const styles = StyleSheet.create({
     container: {

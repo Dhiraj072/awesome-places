@@ -16,6 +16,11 @@ export default (state = initialState, action) => {
             places: state.places.filter((place) => place.key !== state.selectedPlace.key),
             selectedPlace: undefined,
         };
+    case 'DELETE_PLACE':
+        return {
+            ...state,
+            places: state.places.filter((place) => place.key !== action.place.key),
+        };
     case 'SELECT_PLACE':
         return {
             ...state,
