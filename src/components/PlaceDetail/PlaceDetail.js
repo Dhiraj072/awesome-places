@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 export default (props) => (
@@ -10,14 +10,15 @@ export default (props) => (
         />
         <Text style={styles.text}>{props.place ? props.place.name : ''}</Text>
         <View>
-            <View style={styles.button}>
-                <Icon
-                    size={30}
-                    name="ios-trash"
-                    color="red"
-                    onPress={props.handleDeletePlace}
-                />
-            </View>
+            <TouchableOpacity onPress={props.handleDeletePlace} >
+                <View style={styles.button}>
+                    <Icon
+                        size={30}
+                        name="ios-trash"
+                        color="red"
+                    />
+                </View>
+            </TouchableOpacity>
         </View>
     </View>
 );
