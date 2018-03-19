@@ -1,7 +1,11 @@
 import React from 'react';
-import { Text, TextInput, View, Button, StyleSheet } from 'react-native';
+import { Text, TextInput, View, Button, StyleSheet, ImageBackground } from 'react-native';
 import startTabs from '../MainTabs/startMainTabs';
 import Input from '../../components/UI/Input';
+import Heading1 from '../../components/UI/Heading1/Heading1';
+import MainText from '../../components/UI/MainText/MainText';
+import backgroundImage from '../../assets/background.jpg';
+import MainButton from '../../components/UI/MainButton/MainButton';
 
 class AuthScreen extends React.Component {
     handleLogin = () => {
@@ -9,16 +13,21 @@ class AuthScreen extends React.Component {
     }
     render() {
         return (
-            <View style={styles.container}>
-                <Text>Awesome Places</Text>
-                <Button title="Login" onPress={this.handleLogin} />
-                <View style={styles.inputContainer}>
-                    <Input placeholder="Email" />
-                    <Input placeholder="Password" />
-                    <Input placeholder="Confirm Password" />
+            <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
+                <View style={styles.container}>
+                    <MainText>
+                        <Heading1 text="Awesome Places" />
+                    </MainText>
+                    <MainButton color="#ff4d4d" onPress={this.handleLogin}>Login</MainButton>
+                    <View style={styles.inputContainer}>
+                        <Input placeholder="Email" />
+                        <Input placeholder="Password" />
+                        <Input placeholder="Confirm Password" />
+                    </View>
+                    <Button title="Sign up" onPress={this.handleLogin} />
                 </View>
-                <Button title="Sign up" onPress={this.handleLogin} />
-            </View>
+            </ImageBackground>
+
         );
     }
 }
@@ -35,5 +44,9 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         width: '80%',
+    },
+    backgroundImage: {
+        width: '100%',
+        flex: 1,
     },
 });
