@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, ScrollView, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import AddPlaceForm from '../../components/AddPlaceForm/AddPlaceForm';
+import ImagePicker from '../../components/ImagePicker/ImagePicker';
+import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import { addPlace } from '../../store/actions/places';
 import Heading1 from '../../components/UI/Heading1/Heading1';
-import ImagePreview from '../../components/ImagePreview/ImagePreview';
-import placeImage from '../../assets/surfer.jpg';
 import MainButton from '../../components/UI/MainButton/MainButton';
 
 class SharePlaceScreen extends React.Component {
@@ -28,9 +28,8 @@ class SharePlaceScreen extends React.Component {
             <ScrollView>
                 <View style={styles.container}>
                     <Heading1 text="Share a place!" />
-                    <ImagePreview image={placeImage} />
-                    <MainButton>Pick Image</MainButton>
-                    <View><Text>Map</Text></View>
+                    <ImagePicker />
+                    <LocationPicker />
                     <AddPlaceForm />
                     <MainButton>Add Place</MainButton>
                 </View>
