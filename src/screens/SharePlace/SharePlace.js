@@ -7,7 +7,6 @@ import Heading1 from '../../components/UI/Heading1/Heading1';
 import ImagePreview from '../../components/ImagePreview/ImagePreview';
 import placeImage from '../../assets/surfer.jpg';
 import MainButton from '../../components/UI/MainButton/MainButton';
-import Input from '../../components/UI/Input';
 
 class SharePlaceScreen extends React.Component {
     constructor(props) {
@@ -32,10 +31,7 @@ class SharePlaceScreen extends React.Component {
                     <ImagePreview image={placeImage} />
                     <MainButton>Pick Image</MainButton>
                     <View><Text>Map</Text></View>
-                    <Input placeHolder="Enter place name" />
-                    {/* <AddPlaceForm
-                        placeSubmitHandler={this.props.addPlace}
-                    /> */}
+                    <AddPlaceForm />
                     <MainButton>Add Place</MainButton>
                 </View>
             </ScrollView>
