@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Dimensions, StyleSheet } from 'react-native';
+import { View, Dimensions, StyleSheet, Platform } from 'react-native';
 import SideDrawerItem from '../../components/SideDrawerItem/SideDrawerItem';
 
 class SideDrawer extends React.Component {
@@ -10,7 +10,7 @@ class SideDrawer extends React.Component {
         return (
             <View style={[{ width: Dimensions.get('window').width * 0.8 }, styles.container]}>
                 <SideDrawerItem
-                    icon="ios-log-out"
+                    icon={Platform.OS === 'android' ? 'md-log-out' : 'ios-log-out'}
                     text="Logout"
                     onPress={this.handleLogout}
                 />

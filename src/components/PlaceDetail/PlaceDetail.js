@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import MainButton from '../UI/MainButton/MainButton';
 
 export default (props) => (
     <View style={styles.container}>
@@ -10,15 +11,7 @@ export default (props) => (
         />
         <Text style={styles.text}>{props.place ? props.place.name : ''}</Text>
         <View>
-            <TouchableOpacity onPress={props.handleDeletePlace} >
-                <View style={styles.button}>
-                    <Icon
-                        size={30}
-                        name="ios-trash"
-                        color="red"
-                    />
-                </View>
-            </TouchableOpacity>
+            <MainButton onPress={props.handleDeletePlace}>Delete Place</MainButton>
         </View>
     </View>
 );
@@ -36,8 +29,5 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 28,
         textAlign: 'center',
-    },
-    button: {
-        alignItems: 'center',
     },
 });
