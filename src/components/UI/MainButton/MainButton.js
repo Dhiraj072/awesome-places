@@ -26,7 +26,8 @@ export default (props) => {
 const styles = StyleSheet.create({
     button: {
         padding: 10,
-        margin: 5,
+        marginTop: 5,
+        marginBottom: 5,
         backgroundColor: '#ff4d4d',
     },
     text: {

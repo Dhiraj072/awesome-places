@@ -1,19 +1,20 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { StyleSheet, View, Text, Image, ScrollView } from 'react-native';
 import MainButton from '../UI/MainButton/MainButton';
 
 export default (props) => (
-    <View style={styles.container}>
-        <Image
-            style={styles.image}
-            source={props.place ? props.place.image : { uri: '' }}
-        />
-        <Text style={styles.text}>{props.place ? props.place.name : ''}</Text>
-        <View>
-            <MainButton onPress={props.handleDeletePlace}>Delete Place</MainButton>
+    <ScrollView>
+        <View style={styles.container}>
+            <Image
+                style={styles.image}
+                source={props.place ? props.place.image : { uri: '' }}
+            />
+            <Text style={styles.text}>{props.place ? props.place.name : ''}</Text>
+            <View>
+                <MainButton onPress={props.handleDeletePlace}>Delete Place</MainButton>
+            </View>
         </View>
-    </View>
+    </ScrollView>
 );
 
 

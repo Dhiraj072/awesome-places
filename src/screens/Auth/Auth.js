@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ImageBackground } from 'react-native';
+import { View, StyleSheet, ImageBackground, Dimensions } from 'react-native';
 import startTabs from '../MainTabs/startMainTabs';
 import Input from '../../components/UI/Input';
 import Heading1 from '../../components/UI/Heading1/Heading1';
@@ -7,18 +7,44 @@ import MainText from '../../components/UI/MainText/MainText';
 import backgroundImage from '../../assets/background.jpg';
 import MainButton from '../../components/UI/MainButton/MainButton';
 
-class AuthScreen extends React.Component {
+class AuthScreen extends React.Component {   
+    state = {
+        orientation: Dimensions.get('window').height > 500 ? 'portrait' : 'landscape',
+    };
+
+    componentDidMount() {
+        Dimensions.addEventListener('change', this.onDimensionsUpdate);
+    }
+
+    componentWillUnmount() {
+        Dimensions.removeEventListener('change', this.onDimensionsUpdate);
+    }
+
+    onDimensionsUpdate = (dimensions) => {
+        this.setState({ orientation: dimensions.window.height > 500 ? 'portrait' : 'landscape' });
+    }
+
     handleLogin = () => {
         startTabs();
-    }
+    };
+
     render() {
+        let headingText;
+        if (this.state.orientation === 'portrait') {
+            headingText = (
+                <MainText>
+                    <Heading1 text="Awesome Places" />
+                </MainText>
+            );
+        }
         return (
             <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
                 <View style={styles.container}>
-                    <MainText>
-                        <Heading1 text="Awesome Places" />
-                    </MainText>
-                    <View style={styles.inputContainer}>
+                    {headingText}
+                    <View
+                        style={this.state.orientation === 'portrait' ?
+                            styles.portraitInputContainer : styles.landscapeInputContainer}
+                    >
                         <Input placeholder="Email" />
                         <Input placeholder="Password" />
                         <Input placeholder="Confirm Password" />
@@ -42,7 +68,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    inputContainer: {
+    landscapeInputContainer: {
+        width: '50%',
+    },
+    portraitInputContainer: {
         width: '80%',
     },
     backgroundImage: {
