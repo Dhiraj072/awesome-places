@@ -1,21 +1,48 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Image, ScrollView, Dimensions } from 'react-native';
 import MainButton from '../UI/MainButton/MainButton';
 
-export default (props) => (
-    <ScrollView>
-        <View style={styles.container}>
-            <Image
-                style={styles.image}
-                source={props.place ? props.place.image : { uri: '' }}
-            />
-            <Text style={styles.text}>{props.place ? props.place.name : ''}</Text>
-            <View>
-                <MainButton onPress={props.handleDeletePlace}>Delete Place</MainButton>
-            </View>
-        </View>
-    </ScrollView>
-);
+export default class extends React.Component {
+    state = {
+        orientation: Dimensions.get('window').height > 500 ? 'portrait' : 'landscape',
+    };
+
+    componentDidMount() {
+        Dimensions.addEventListener('change', this.onDimensionsUpdate);
+    }
+
+    componentWillUnmount() {
+        Dimensions.removeEventListener('change', this.onDimensionsUpdate);
+    }
+
+    onDimensionsUpdate = (dimensions) => {
+        this.setState({ orientation: dimensions.window.height > 500 ? 'portrait' : 'landscape' });
+    }
+
+    render() {
+        let content;
+        if (this.state.orientation === 'portrait') {
+            content = (
+                <View>
+                    <Text style={styles.text}>{this.props.place ? this.props.place.name : ''}</Text>
+                    <MainButton onPress={this.props.handleDeletePlace}>Delete Place</MainButton>
+                </View>
+            );
+        }
+
+        return (
+            <ScrollView>
+                <View style={styles.container}>
+                    <Image
+                        style={styles.image}
+                        source={this.props.place ? this.props.place.image : { uri: '' }}
+                    />
+                    { content }
+                </View>
+            </ScrollView>
+        );
+    }
+}
 
 
 const styles = StyleSheet.create({
