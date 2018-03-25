@@ -9,6 +9,10 @@ import MainButton from '../../components/UI/MainButton/MainButton';
 import Input from '../../components/UI/Input';
 
 class SharePlaceScreen extends React.Component {
+    static navigatorStyle = {
+        navBarButtonColor: '#ff4d4d',
+    }
+
     constructor(props) {
         super(props);
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
