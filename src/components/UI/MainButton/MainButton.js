@@ -3,7 +3,7 @@ import { TouchableNativeFeedback, TouchableOpacity, Text, View, StyleSheet, Plat
 
 export default (props) => {
     const content = (
-        <View style={styles.button}>
+        <View style={[styles.button, props.disabled ? styles.disabled : null]}>
             <Text style={styles.text}>
                 {props.children}
             </Text>
@@ -17,7 +17,10 @@ export default (props) => {
         );
     }
     return (
-        <TouchableOpacity onPress={props.onPress} >
+        <TouchableOpacity
+            onPress={props.onPress}
+            disabled={props.disabled}    
+        >
             {content}
         </TouchableOpacity>
     );
@@ -33,5 +36,8 @@ const styles = StyleSheet.create({
     text: {
         color: 'white',
         textAlign: 'center',
+    },
+    disabled: {
+        backgroundColor: 'grey',
     },
 });

@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { View, StyleSheet, ImageBackground, Dimensions } from 'react-native';
 import startTabs from '../MainTabs/startMainTabs';
 import Input from '../../components/UI/Input';
@@ -7,6 +8,7 @@ import MainText from '../../components/UI/MainText/MainText';
 import backgroundImage from '../../assets/background.jpg';
 import MainButton from '../../components/UI/MainButton/MainButton';
 import validate from '../../utility/validation';
+import { tryAuth } from '../../store/actions/index';
 
 class AuthScreen extends React.Component {
     state = {
@@ -18,6 +20,7 @@ class AuthScreen extends React.Component {
                 validationRules: {
                     isEmail: true,
                 },
+                touched: false,
             },
             password: {
                 value: '',
@@ -25,6 +28,7 @@ class AuthScreen extends React.Component {
                 validationRules: {
                     minLength: 6,
                 },
+                touched: false,
             },
             confirmPassword: {
                 value: '',
@@ -32,6 +36,7 @@ class AuthScreen extends React.Component {
                 validationRules: {
                     equalTo: 'password',
                 },
+                touched: false,
             },
         },
     };
@@ -49,6 +54,10 @@ class AuthScreen extends React.Component {
     }
 
     handleLogin = () => {
+        const authData = {
+            email: this.state.controls.email.value,
+            password: this.state.controls.password.value,
+        };
         startTabs();
     };
 
@@ -71,6 +80,7 @@ class AuthScreen extends React.Component {
                 [key]: {
                     ...state.controls[key],
                     value,
+                    touched: true,
                     valid: validate(value, state.controls[key].validationRules, connectedValue),
                 },
             },
@@ -86,6 +96,9 @@ class AuthScreen extends React.Component {
                 </MainText>
             );
         }
+        const disabled = !this.state.controls.email.valid ||
+            !this.state.controls.password.valid ||
+            !this.state.controls.confirmPassword.valid;
         return (
             <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
                 <View style={styles.container}>
@@ -98,19 +111,35 @@ class AuthScreen extends React.Component {
                             placeholder="Email"
                             value={this.state.controls.email.value}
                             onChangeText={(val) => this.handleUpdateInput('email', val)}
+                            valid={this.state.controls.email.valid}
+                            touched={this.state.controls.email.touched}
                         />
                         <Input
                             placeholder="Password"
                             value={this.state.controls.password.value}
                             onChangeText={(val) => this.handleUpdateInput('password', val)}
+                            valid={this.state.controls.password.valid}
+                            touched={this.state.controls.password.touched}
                         />
                         <Input
                             placeholder="Confirm Password"
                             value={this.state.controls.confirmPassword.value}
                             onChangeText={(val) => this.handleUpdateInput('confirmPassword', val)}
+                            valid={this.state.controls.confirmPassword.valid}
+                            touched={this.state.controls.confirmPassword.touched}
                         />
-                        <MainButton onPress={this.handleLogin}>Sign up</MainButton>
-                        <MainButton color="#ff4d4d" onPress={this.handleLogin}>Login</MainButton>
+                        <MainButton
+                            onPress={this.handleLogin}
+                            disabled={disabled}
+                        >
+                            Sign up
+                        </MainButton>
+                        <MainButton 
+                            color="#ff4d4d"
+                            onPress={this.handleLogin}
+                        >
+                            Login
+                        </MainButton>
                     </View>
                 </View>
             </ImageBackground>
@@ -119,7 +148,11 @@ class AuthScreen extends React.Component {
     }
 }
 
-export default AuthScreen;
+const mapDispatchToProps = (dispatch) => ({
+    onLogin: (authData) => dispatch(tryAuth(authData)),
+});
+
+export default connect(undefined, mapDispatchToProps)(AuthScreen);
 
 const styles = StyleSheet.create({
     container: {

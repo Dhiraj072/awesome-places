@@ -6,7 +6,11 @@ export default (props) => (
         underlineColorAndroid="transparent"
         placeholderTextColor="#bdc3c7"
         {...props}
-        style={[styles.input, props.style]} // Pass in styles prop to override styles here
+        style={[
+            styles.input,
+            props.style,
+            !props.valid && props.touched ? styles.invalid : null,
+        ]} // Pass in styles prop to override styles here
     />
 );
 
@@ -19,5 +23,8 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginBottom: 5,
         color: 'white',
+    },
+    invalid: {
+        borderColor: 'red',
     },
 });
