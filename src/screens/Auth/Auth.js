@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { View, StyleSheet, ImageBackground, Dimensions } from 'react-native';
+import { View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, StyleSheet, ImageBackground, Dimensions } from 'react-native';
 import startTabs from '../MainTabs/startMainTabs';
 import Input from '../../components/UI/Input';
 import Heading1 from '../../components/UI/Heading1/Heading1';
@@ -13,6 +13,7 @@ import { tryAuth } from '../../store/actions/index';
 class AuthScreen extends React.Component {
     state = {
         orientation: Dimensions.get('window').height > 500 ? 'portrait' : 'landscape',
+        authMode: 'login',
         controls: {
             email: {
                 value: '',
@@ -61,6 +62,12 @@ class AuthScreen extends React.Component {
         startTabs();
     };
 
+    handleToggleMode = () => {
+        this.setState((state) => ({
+            authMode: state.authMode === 'login' ? 'signup' : 'login',
+        }));
+    };
+
     handleUpdateInput = (key, value) => {
         let connectedValue = {};
         // Set value of equalTo to the actual value of the field
@@ -89,6 +96,19 @@ class AuthScreen extends React.Component {
 
     render() {
         let headingText;
+        let confirmPasswordContent;
+        if (this.state.authMode === 'signup') {
+            confirmPasswordContent = (
+                <Input
+                    placeholder="Confirm Password"
+                    value={this.state.controls.confirmPassword.value}
+                    onChangeText={(val) => this.handleUpdateInput('confirmPassword', val)}
+                    valid={this.state.controls.confirmPassword.valid}
+                    touched={this.state.controls.confirmPassword.touched}
+                    secureTextEntry
+                />
+            );
+        }
         if (this.state.orientation === 'portrait') {
             headingText = (
                 <MainText>
@@ -98,50 +118,50 @@ class AuthScreen extends React.Component {
         }
         const disabled = !this.state.controls.email.valid ||
             !this.state.controls.password.valid ||
-            !this.state.controls.confirmPassword.valid;
+            (!this.state.controls.confirmPassword.valid && this.state.authMode === 'signup');
         return (
             <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
-                <View style={styles.container}>
+                <KeyboardAvoidingView style={styles.container} behavior="padding">
                     {headingText}
-                    <View
-                        style={this.state.orientation === 'portrait' ?
-                            styles.portraitInputContainer : styles.landscapeInputContainer}
-                    >
-                        <Input
-                            placeholder="Email"
-                            value={this.state.controls.email.value}
-                            onChangeText={(val) => this.handleUpdateInput('email', val)}
-                            valid={this.state.controls.email.valid}
-                            touched={this.state.controls.email.touched}
-                        />
-                        <Input
-                            placeholder="Password"
-                            value={this.state.controls.password.value}
-                            onChangeText={(val) => this.handleUpdateInput('password', val)}
-                            valid={this.state.controls.password.valid}
-                            touched={this.state.controls.password.touched}
-                        />
-                        <Input
-                            placeholder="Confirm Password"
-                            value={this.state.controls.confirmPassword.value}
-                            onChangeText={(val) => this.handleUpdateInput('confirmPassword', val)}
-                            valid={this.state.controls.confirmPassword.valid}
-                            touched={this.state.controls.confirmPassword.touched}
-                        />
-                        <MainButton
-                            onPress={this.handleLogin}
-                            disabled={disabled}
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <View
+                            style={this.state.orientation === 'portrait' ?
+                                styles.portraitInputContainer : styles.landscapeInputContainer}
                         >
-                            Sign up
-                        </MainButton>
-                        <MainButton 
-                            color="#ff4d4d"
-                            onPress={this.handleLogin}
-                        >
-                            Login
-                        </MainButton>
-                    </View>
-                </View>
+                            <Input
+                                placeholder="Email"
+                                value={this.state.controls.email.value}
+                                onChangeText={(val) => this.handleUpdateInput('email', val)}
+                                valid={this.state.controls.email.valid}
+                                touched={this.state.controls.email.touched}
+                                autoCorrect={false}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                            />
+                            <Input
+                                placeholder="Password"
+                                value={this.state.controls.password.value}
+                                onChangeText={(val) => this.handleUpdateInput('password', val)}
+                                valid={this.state.controls.password.valid}
+                                touched={this.state.controls.password.touched}
+                                secureTextEntry
+                            />
+                            { confirmPasswordContent }
+                            <MainButton
+                                onPress={this.handleToggleMode}
+                            >
+                            Switch to { this.state.authMode === 'login' ? 'Sign Up' : 'Login' }
+                            </MainButton>
+                            <MainButton
+                                color="#ff4d4d"
+                                onPress={this.handleLogin}
+                                disabled={disabled}
+                            >
+                            Submit
+                            </MainButton>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </KeyboardAvoidingView>
             </ImageBackground>
 
         );
