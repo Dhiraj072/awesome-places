@@ -14,10 +14,12 @@ class AuthScreen extends React.Component {
     state = {
         orientation: Dimensions.get('window').height > 500 ? 'portrait' : 'landscape',
         authMode: 'login',
+        // Set valid to true for dev
+        // TODO Set valid to false before release
         controls: {
             email: {
                 value: '',
-                valid: false,
+                valid: true,
                 validationRules: {
                     isEmail: true,
                 },
@@ -25,7 +27,7 @@ class AuthScreen extends React.Component {
             },
             password: {
                 value: '',
-                valid: false,
+                valid: true,
                 validationRules: {
                     minLength: 6,
                 },
@@ -33,7 +35,7 @@ class AuthScreen extends React.Component {
             },
             confirmPassword: {
                 value: '',
-                valid: false,
+                valid: true,
                 validationRules: {
                     equalTo: 'password',
                 },
@@ -176,7 +178,6 @@ export default connect(undefined, mapDispatchToProps)(AuthScreen);
 
 const styles = StyleSheet.create({
     container: {
-        borderColor: 'red',
         borderWidth: 1,
         flex: 1,
         justifyContent: 'center',

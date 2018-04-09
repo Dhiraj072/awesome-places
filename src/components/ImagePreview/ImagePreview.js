@@ -9,7 +9,6 @@ export default (props) => (
 
 const styles = StyleSheet.create({
     container: {
-        borderColor: 'red',
         borderWidth: 1,
         width: '100%',
         height: 150,
