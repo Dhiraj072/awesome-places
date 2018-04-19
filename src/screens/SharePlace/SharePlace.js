@@ -27,6 +27,10 @@ class SharePlaceScreen extends React.Component {
             },
             touched: false,
         },
+        placeLocation: {
+            value: null,
+            valid: false,
+        },
     }
     onNavigatorEvent = (event) => {
         if (event.type === 'NavBarButtonPress') {
@@ -57,6 +61,7 @@ class SharePlaceScreen extends React.Component {
                 image: {
                     uri: 'https://images.pexels.com/photos/189349/pexels-photo-189349.jpeg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb',
                 },
+                location: this.state.placeLocation.value,
             };
             this.props.addPlace(place);
             this.setState((state) => ({
@@ -70,6 +75,15 @@ class SharePlaceScreen extends React.Component {
         }
     };
 
+    handleLocationPick = (location) => {
+        console.log('handling location pick');
+        this.setState((state) => ({
+            placeLocation: {
+                value: location,
+                valid: true,
+            },
+        }));
+    }
     render() {
         return (
             <ScrollView>
@@ -77,7 +91,9 @@ class SharePlaceScreen extends React.Component {
                     <View>
                         <Heading1 text="Share a place!" />
                         <ImagePicker />
-                        <LocationPicker />
+                        <LocationPicker
+                            onLocationPick={this.handleLocationPick}
+                        />
                         <Input
                             placeHolder="Enter place name"
                             value={this.state.placeName.value}
@@ -85,7 +101,8 @@ class SharePlaceScreen extends React.Component {
                         />
                         <MainButton
                             onPress={this.handleAddPlace}
-                            disabled={!this.state.placeName.valid}
+                            disabled={!this.state.placeName.valid ||
+                                      !this.state.placeLocation.valid}
                         >
                         Add Place
                         </MainButton>

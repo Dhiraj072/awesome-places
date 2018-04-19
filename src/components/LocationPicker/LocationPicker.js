@@ -4,45 +4,72 @@ import MapView from 'react-native-maps';
 import MainButton from '../../components/UI/MainButton/MainButton';
 
 export default class LocationPicker extends React.Component {
-    state = {
-        initialRegion: {
-            latitude: 37.790052,
-            longitude: -122.4013706,
-            latitudeDelta: 0.0122,
-            longitudeDelta:
-                (Dimensions.get('window').width / 
-                Dimensions.get('window').height) * 0.0122,
-        },
-        pickedLocation: {
-            latitude: '',
-            longitude: '',
-        },
+    constructor(props) {
+        super(props);
+        this.state = {
+            region: {
+                latitude: 37.795834,
+                longitude: -122.406418,
+                latitudeDelta: 0.0122,
+                longitudeDelta:
+                    (Dimensions.get('window').width /
+                    Dimensions.get('window').height) * 0.0122,
+            },
+            pickedLocation: {
+                latitude: '',
+                longitude: '',
+            },
+        };
     }
-    handleLocationPick = (event) => {
-        const coordinates = event.nativeEvent.coordinate;
-        this.setState((state) => ({
+    setPickedLocation = (coordinates) => {
+        this.setState(() => ({
             pickedLocation: {
                 latitude: coordinates.latitude,
                 longitude: coordinates.longitude,
             },
-        }));
+        }), () => {
+            console.log('locpick callback');
+            this.props.onLocationPick(this.state.pickedLocation);
+        });
+    };
+    handleLocateMe = () => {
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            this.setPickedLocation({
+                latitude: lat,
+                longitude: lon,
+            });
+            this.map.animateToRegion({
+                ...this.state.region,
+                latitude: lat,
+                longitude: lon,
+            });
+        }, () => {
+            alert('Unable to get location. Check location settings');
+        }, { timeout: 1000 });
+    };
+    handleLocationPick = (event) => {
+        const coordinates = event.nativeEvent.coordinate;
+        this.setPickedLocation(coordinates);
     };
     render() {
         let marker = null;
         if (this.state.pickedLocation.latitude !== '' &&
         this.state.pickedLocation.longitude !== '') {
-            marker = <MapView.Marker coordinate={this.state.pickedLocation} />
-        };
+            marker = <MapView.Marker coordinate={this.state.pickedLocation} />;
+        }
         return (
             <View>
                 <MapView
-                    initialRegion={this.state.initialRegion}
+                    initialRegion={this.state.region}
                     style={styles.map}
                     onPress={this.handleLocationPick}
+                    ref={(ref) => this.map = ref}
                 >
                     {marker}
                 </MapView>
-                <MainButton onPress={this.handleLocationPick}>Pick Location</MainButton>
+                <MainButton onPress={this.handleLocateMe}>Locate Me</MainButton>
             </View>
         );
     }
@@ -51,6 +78,6 @@ export default class LocationPicker extends React.Component {
 const styles = StyleSheet.create({
     map: {
         width: '100%',
-        height: 250,
+        height: 200,
     },
 });
