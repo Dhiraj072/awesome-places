@@ -28,7 +28,6 @@ export default class LocationPicker extends React.Component {
                 longitude: coordinates.longitude,
             },
         }), () => {
-            console.log('locpick callback');
             this.props.onLocationPick(this.state.pickedLocation);
         });
     };

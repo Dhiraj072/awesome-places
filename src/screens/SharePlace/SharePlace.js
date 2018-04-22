@@ -76,8 +76,7 @@ class SharePlaceScreen extends React.Component {
     };
 
     handleLocationPick = (location) => {
-        console.log('handling location pick');
-        this.setState((state) => ({
+        this.setState(() => ({
             placeLocation: {
                 value: location,
                 valid: true,
