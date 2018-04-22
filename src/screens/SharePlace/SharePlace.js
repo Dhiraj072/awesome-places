@@ -31,6 +31,10 @@ class SharePlaceScreen extends React.Component {
             value: null,
             valid: false,
         },
+        placeImage: {
+            value: null,
+            valid: false,
+        },
     }
     onNavigatorEvent = (event) => {
         if (event.type === 'NavBarButtonPress') {
@@ -58,9 +62,7 @@ class SharePlaceScreen extends React.Component {
             const place = {
                 key: Math.random(),
                 name: this.state.placeName.value,
-                image: {
-                    uri: 'https://images.pexels.com/photos/189349/pexels-photo-189349.jpeg?w=1260&h=750&dpr=2&auto=compress&cs=tinysrgb',
-                },
+                image: this.state.placeImage.value,
                 location: this.state.placeLocation.value,
             };
             this.props.addPlace(place);
@@ -83,13 +85,26 @@ class SharePlaceScreen extends React.Component {
             },
         }));
     }
+
+    handleImagePick = (image) => {
+        this.setState((state) => ({
+            ...state,
+            placeImage: {
+                value: image,
+                valid: true,
+            },
+        }));
+    }
+
     render() {
         return (
             <ScrollView>
                 <KeyboardAvoidingView style={styles.container} behavior="padding">
                     <View>
                         <Heading1 text="Share a place!" />
-                        <ImagePicker />
+                        <ImagePicker
+                            onImagePicked={this.handleImagePick}
+                        />
                         <LocationPicker
                             onLocationPick={this.handleLocationPick}
                         />
