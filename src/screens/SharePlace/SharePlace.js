@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, KeyboardAvoidingView, Keyboard, ScrollView, StyleSheet } from 'react-native';
+import { View, KeyboardAvoidingView, ScrollView, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 import ImagePicker from '../../components/ImagePicker/ImagePicker';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
@@ -97,11 +97,15 @@ class SharePlaceScreen extends React.Component {
     }
 
     render() {
+        let submitButtonText = 'Add Place';
+        // TODO Use an activity indicator modal here
+        if (this.props.isLoading) {
+            submitButtonText = 'Adding Place ...';
+        }
         return (
             <ScrollView>
                 <KeyboardAvoidingView style={styles.container} behavior="padding">
                     <View>
-                        <Heading1 text="Share a place!" />
                         <ImagePicker
                             onImagePicked={this.handleImagePick}
                         />
@@ -118,7 +122,7 @@ class SharePlaceScreen extends React.Component {
                             disabled={!this.state.placeName.valid ||
                                       !this.state.placeLocation.valid}
                         >
-                        Add Place
+                            { submitButtonText }
                         </MainButton>
                     </View>
                 </KeyboardAvoidingView>
@@ -127,11 +131,15 @@ class SharePlaceScreen extends React.Component {
     }
 }
 
+const mapStateToProps = (state) => ({
+    isLoading: state.ui.isLoading,
+});
+
 const mapDispatchToProps = (dispatch) => ({
     addPlace: (place) => dispatch(addPlace(place)),
 });
 
-export default connect(undefined, mapDispatchToProps)(SharePlaceScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SharePlaceScreen);
 
 const styles = StyleSheet.create({
     container: {

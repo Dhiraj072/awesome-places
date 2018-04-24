@@ -1,6 +1,7 @@
 import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import placesReducer from './reducers/places';
+import uiReducer from './reducers/ui';
 
 let composeEnhancers = compose;
 
@@ -12,6 +13,7 @@ if (__DEV__) {
 
 const reducers = combineReducers({
     app: placesReducer,
+    ui: uiReducer,
 });
 
 const configureStore = () => createStore(reducers, composeEnhancers(applyMiddleware(thunk)));
