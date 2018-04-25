@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { View, Animated } from 'react-native';
 import PlaceList from '../../components/PlaceList/PlaceList';
 import MainButton from '../../components/UI/MainButton/MainButton';
+import { getPlaces } from '../../store/actions/places';
 
 class FindPlaceScreen extends React.Component {
     static navigatorStyle = {
@@ -20,6 +21,9 @@ class FindPlaceScreen extends React.Component {
         fadeInAnim: new Animated.Value(0),
     };
 
+    componentDidMount() {
+        this.props.getPlaces();
+    }
 
     onNavigatorEvent = (event) => {
         if (event.type === 'NavBarButtonPress') {
@@ -105,4 +109,8 @@ const mapStateToProps = (state) => ({
     places: state.app.places,
 });
 
-export default connect(mapStateToProps)(FindPlaceScreen);
+const mapDispatchToProps = (dispatch) => ({
+    getPlaces: () => dispatch(getPlaces()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(FindPlaceScreen);

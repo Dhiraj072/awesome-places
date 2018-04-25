@@ -1,5 +1,5 @@
 import {
-    ADD_PLACE,
+    SET_PLACES,
     DELETE_SELECTED_PLACE,
     DELETE_PLACE,
     SELECT_PLACE,
@@ -14,10 +14,10 @@ const initialState = {
 
 export default (state = initialState, action) => {
     switch (action.type) {
-    case ADD_PLACE:
+    case SET_PLACES:
         return {
             ...state,
-            places: state.places.concat(action.place),
+            places: action.places,
         };
     case DELETE_SELECTED_PLACE:
         return {
