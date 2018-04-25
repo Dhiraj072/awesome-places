@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, StyleSheet, ImageBackground, Dimensions } from 'react-native';
-import startTabs from '../MainTabs/startMainTabs';
 import Input from '../../components/UI/Input';
 import Heading1 from '../../components/UI/Heading1/Heading1';
 import MainText from '../../components/UI/MainText/MainText';
@@ -53,7 +52,9 @@ class AuthScreen extends React.Component {
     }
 
     onDimensionsUpdate = (dimensions) => {
-        this.setState({ orientation: dimensions.window.height > 500 ? 'portrait' : 'landscape' });
+        this.setState({
+            orientation: dimensions.window.height > 500 ? 'portrait' : 'landscape',
+        });
     }
 
     handleLogin = () => {
@@ -61,7 +62,7 @@ class AuthScreen extends React.Component {
             email: this.state.controls.email.value,
             password: this.state.controls.password.value,
         };
-        startTabs();
+        this.props.onLogin(authData);
     };
 
     handleToggleMode = () => {
@@ -99,6 +100,7 @@ class AuthScreen extends React.Component {
     render() {
         let headingText;
         let confirmPasswordContent;
+        let submitButtonContent = 'Submit';
         if (this.state.authMode === 'signup') {
             confirmPasswordContent = (
                 <Input
@@ -118,9 +120,13 @@ class AuthScreen extends React.Component {
                 </MainText>
             );
         }
-        const disabled = !this.state.controls.email.valid ||
-            !this.state.controls.password.valid ||
-            (!this.state.controls.confirmPassword.valid && this.state.authMode === 'signup');
+        let disabled = !this.state.controls.email.valid ||
+        !this.state.controls.password.valid ||
+        (!this.state.controls.confirmPassword.valid && this.state.authMode === 'signup');
+        if (this.props.isLoading) {
+            submitButtonContent = 'Processing ...';
+            disabled = true;
+        }
         return (
             <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
                 <KeyboardAvoidingView style={styles.container} behavior="padding">
@@ -159,7 +165,7 @@ class AuthScreen extends React.Component {
                                 onPress={this.handleLogin}
                                 disabled={disabled}
                             >
-                            Submit
+                                {submitButtonContent}
                             </MainButton>
                         </View>
                     </TouchableWithoutFeedback>
@@ -170,11 +176,15 @@ class AuthScreen extends React.Component {
     }
 }
 
+const mapStateToProps = (state) => ({
+    isLoading: state.ui.isLoading,
+});
+
 const mapDispatchToProps = (dispatch) => ({
     onLogin: (authData) => dispatch(tryAuth(authData)),
 });
 
-export default connect(undefined, mapDispatchToProps)(AuthScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(AuthScreen);
 
 const styles = StyleSheet.create({
     container: {
