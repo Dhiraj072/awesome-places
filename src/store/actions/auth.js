@@ -2,13 +2,17 @@ import { uiStartLoading, uiStopLoading } from './ui';
 import startMainTabs from '../../screens/MainTabs/startMainTabs';
 
 const API_KEY = 'AIzaSyCK2rDlKTdc2NZpDXOmiIYfq1NLrL94hls';
-const AUTH_URL = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${API_KEY}`;
+let AUTH_URL;
 
-export const tryAuth = (authData) => (dispatch) => {
-    dispatch(authSignup(authData));
-};
-
-export const authSignup = (authData) => (dispatch) => {
+// Login user. Sign up and then login for a new user
+const tryAuth = (authData, authMode) => (dispatch) => {
+    if (authMode === 'signup') {
+        AUTH_URL = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${API_KEY}`;
+    } else if (authMode === 'login') {
+        AUTH_URL = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${API_KEY}`;
+    } else {
+        throw new Error('Unknown authMode ', authMode);
+    }
     dispatch(uiStartLoading());
     fetch(AUTH_URL, {
         method: 'POST',
@@ -35,3 +39,5 @@ export const authSignup = (authData) => (dispatch) => {
             dispatch(uiStopLoading());
         });
 };
+
+export default tryAuth;

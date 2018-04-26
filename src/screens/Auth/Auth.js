@@ -7,7 +7,7 @@ import MainText from '../../components/UI/MainText/MainText';
 import backgroundImage from '../../assets/background.jpg';
 import MainButton from '../../components/UI/MainButton/MainButton';
 import validate from '../../utility/validation';
-import { tryAuth } from '../../store/actions/index';
+import tryAuth from '../../store/actions/index';
 
 class AuthScreen extends React.Component {
     state = {
@@ -62,7 +62,7 @@ class AuthScreen extends React.Component {
             email: this.state.controls.email.value,
             password: this.state.controls.password.value,
         };
-        this.props.onLogin(authData);
+        this.props.onTryAuth(authData, this.state.authMode);
     };
 
     handleToggleMode = () => {
@@ -181,7 +181,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    onLogin: (authData) => dispatch(tryAuth(authData)),
+    onTryAuth: (authData, authMode) => dispatch(tryAuth(authData, authMode)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuthScreen);
