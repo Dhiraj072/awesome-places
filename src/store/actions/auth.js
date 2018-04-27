@@ -1,11 +1,12 @@
 import { uiStartLoading, uiStopLoading } from './ui';
 import startMainTabs from '../../screens/MainTabs/startMainTabs';
+import { AUTH_SET_TOKEN } from './actionTypes';
 
 const API_KEY = 'AIzaSyCK2rDlKTdc2NZpDXOmiIYfq1NLrL94hls';
 let AUTH_URL;
 
 // Login user. Sign up and then login for a new user
-const tryAuth = (authData, authMode) => (dispatch) => {
+export const tryAuth = (authData, authMode) => (dispatch) => {
     if (authMode === 'signup') {
         AUTH_URL = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${API_KEY}`;
     } else if (authMode === 'login') {
@@ -24,20 +25,36 @@ const tryAuth = (authData, authMode) => (dispatch) => {
             'Content-Type': 'application/json',
         },
     })
+        .then((response) => response.json())
+        .then((parsedResponse) => {
+            if (!parsedResponse.idToken) {
+                alert(`Failed! ${parsedResponse.error.message}`);
+            } else {
+                dispatch(authSetToken(parsedResponse.idToken));
+                startMainTabs();
+            }
+            dispatch(uiStopLoading());
+        })
         .catch((err) => {
             alert('Something went wrong');
             dispatch(uiStopLoading());
             throw err;
-        })
-        .then((response) => response.json())
-        .then((parsedResponse) => {
-            if (parsedResponse.error) {
-                alert(`Failed! ${parsedResponse.error.message}`);
-            } else {
-                startMainTabs();
-            }
-            dispatch(uiStopLoading());
         });
 };
 
-export default tryAuth;
+export const authSetToken = (token) => ({
+    type: AUTH_SET_TOKEN,
+    token,
+});
+
+export const authGetToken = () => (dispatch, getState) => {
+    const token = getState().auth.token;
+    const promise = new Promise((resolve, reject) => {
+        if (!token) {
+            reject();
+        } else {
+            resolve(token);
+        }
+    });
+    return promise;
+};

@@ -6,55 +6,67 @@ import {
     DESELECT_PLACE,
 }
     from './actionTypes';
-import { uiStartLoading, uiStopLoading } from './index';
+import { uiStartLoading, uiStopLoading, authGetToken } from './index';
 
 const handleError = (error) => {
     alert('Something went wrong!');
     throw error;
 };
 
-const stopLoadingAndHandleError = (error, dispatch) => {
-    dispatch(uiStopLoading());
-    handleError(error);
+const handleAuthError = (error) => {
+    alert('Not logged in!');
+    throw new Error('Not authenticated', error);
+};
+
+const checkAndHandleErrors = (response, dispatch) => {
+    if (!response.ok) {
+        dispatch(uiStopLoading());
+        alert(`Request rejected with status ${response.status}`);
+        throw new Error('Error');
+    } else {
+        return response;
+    }
 };
 
 // TODO this does not handle 400/500 errors yet
 // putting a catch at the end of a fetch/catch/then should handle them
 export const addPlace = (place) => (dispatch) => {
     dispatch(uiStartLoading());
-    fetch(
-        'https://us-central1-awesome-places-1523022274720.cloudfunctions.net/storeImage',
-        {
-            method: 'POST',
-            body: JSON.stringify({
-                image: place.image.base64,
-            }),
-        },
-    )
-        .catch((err) => {
-            stopLoadingAndHandleError(err, dispatch);
-        })
-        .then((response) => response.json())
-        .then((parsedResponse) => {
-            const placeData = {
-                name: place.name,
-                location: place.location,
-                image: {
-                    uri: parsedResponse.imageUrl,
+    dispatch(authGetToken())
+        .then((token) => {
+            fetch(
+                'https://us-central1-awesome-places-1523022274720.cloudfunctions.net/storeImage',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        image: place.image.base64,
+                    }),
                 },
-            };
-            fetch('https://awesome-places-1523022274720.firebaseio.com/places.json', {
-                method: 'POST',
-                body: JSON.stringify(placeData),
-            })
-                .catch((err) => {
-                    stopLoadingAndHandleError(err, dispatch);
-                })
+            )
+                .then((response) => checkAndHandleErrors(response, dispatch))
                 .then((response) => response.json())
-                .then(() => {
-                    dispatch(uiStopLoading());
-                });
-        });
+                .then((parsedResponse) => {
+                    const placeData = {
+                        name: place.name,
+                        location: place.location,
+                        image: {
+                            uri: parsedResponse.imageUrl,
+                        },
+                    };
+                    fetch('https://awesome-places-1523022274720.firebaseio.com/places.json', {
+                        method: 'POST',
+                        body: JSON.stringify(placeData),
+                    })
+                        .then((response) => checkAndHandleErrors(response, dispatch))
+                        .then((response) => response.json())
+                        .then(() => {
+                            dispatch(uiStopLoading());
+                        })
+                        .catch((err) => handleError(err));
+                })
+                .catch((err) => handleError(err));
+        })
+        .catch((error) => handleAuthError(error));
 };
 
 export const deleteSelectedPlace = () => ({
@@ -62,21 +74,23 @@ export const deleteSelectedPlace = () => ({
 });
 
 export const deletePlace = (place) => (dispatch) => {
-    fetch(`https://awesome-places-1523022274720.firebaseio.com/places/${place.key}.json`, {
-        method: 'DELETE',
-    })
-        .catch((err) => handleError(err))
-        .then(() => {
-            dispatch({
-                type: DELETE_PLACE,
-                place,
-            });
-        });
+    dispatch(authGetToken())
+        .then((token) => {
+            fetch('https://awesome-places-1523022274720.firebaseio.com' +
+            `/places/${place.key}.json?auth=${token}`, {
+                method: 'DELETE',
+            })
+                .then((response) => checkAndHandleErrors(response, dispatch))
+                .then(() => {
+                    dispatch({
+                        type: DELETE_PLACE,
+                        place,
+                    });
+                })
+                .catch((err) => handleError(err));
+        })
+        .catch((error) => handleAuthError(error));
 };
-// ({
-//     type: DELETE_PLACE,
-//     place,
-// });
 
 export const selectPlace = (place) => ({
     type: SELECT_PLACE,
@@ -93,18 +107,25 @@ export const setPlaces = (places) => ({
 });
 
 export const getPlaces = () => (dispatch) => {
-    fetch('https://awesome-places-1523022274720.firebaseio.com/places.json')
-        .catch((err) => handleError(err))
-        .then((response) => response.json())
-        .then((parsedResponse) => {
-            const places = [];
-            // FIXME do not iterate over everything, only the keys
-            for (const key in parsedResponse) {
-                places.push({
-                    ...parsedResponse[key],
-                    key,
-                });
-            }
-            dispatch(setPlaces(places));
-        });
+    dispatch(authGetToken())
+        .then((token) => {
+            fetch('https://awesome-places-1523022274720.firebaseio.com/' +
+            `places.json?auth=${token}`)
+            // .then((response) => checkAndHandleErrors(response, dispatch))
+                .then((response) => response.json())
+                .then((parsedResponse) => {
+                    const places = [];
+                    // FIXME do not iterate over everything, only the keys
+                    console.log('parsedResponse', parsedResponse);
+                    Object.keys(parsedResponse).forEach((key) => {
+                        places.push({
+                            ...parsedResponse[key],
+                            key,
+                        });
+                    });
+                    dispatch(setPlaces(places));
+                })
+                .catch((err) => handleError(err));
+        })
+        .catch((error) => handleAuthError(error));
 };

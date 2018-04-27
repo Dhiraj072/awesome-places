@@ -7,7 +7,7 @@ import MainText from '../../components/UI/MainText/MainText';
 import backgroundImage from '../../assets/background.jpg';
 import MainButton from '../../components/UI/MainButton/MainButton';
 import validate from '../../utility/validation';
-import tryAuth from '../../store/actions/index';
+import { tryAuth } from '../../store/actions/index';
 
 class AuthScreen extends React.Component {
     state = {
@@ -17,7 +17,7 @@ class AuthScreen extends React.Component {
         // TODO Set valid to false before release
         controls: {
             email: {
-                value: '',
+                value: 'test@bot.com',
                 valid: true,
                 validationRules: {
                     isEmail: true,
@@ -25,7 +25,7 @@ class AuthScreen extends React.Component {
                 touched: false,
             },
             password: {
-                value: '',
+                value: '123456',
                 valid: true,
                 validationRules: {
                     minLength: 6,
