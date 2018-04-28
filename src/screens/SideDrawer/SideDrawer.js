@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, Dimensions, StyleSheet, Platform } from 'react-native';
+import { connect } from 'react-redux';
 import SideDrawerItem from '../../components/SideDrawerItem/SideDrawerItem';
+import { logout } from '../../store/actions/index';
 
 class SideDrawer extends React.Component {
     handleLogout = () => {
-
+        console.log('handle logout');
+        this.props.logout();
     };
     render() {
         return (
@@ -19,7 +22,11 @@ class SideDrawer extends React.Component {
     }
 }
 
-export default SideDrawer;
+const mapDispatchToProps = (dispatch) =>({
+    logout: () => dispatch(logout()),
+});
+
+export default connect(undefined, mapDispatchToProps)(SideDrawer);
 
 const styles = StyleSheet.create({
     container: {

@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 export default (props) => (
-    <TouchableOpacity onPress={props.handleLogout}>
+    <TouchableOpacity onPress={props.onPress}>
         <View style={styles.container}>
             <Icon
                 name={props.icon}

@@ -1,8 +1,9 @@
 import { AsyncStorage } from 'react-native';
 import { uiStartLoading, uiStopLoading } from './ui';
 import startMainTabs from '../../screens/MainTabs/startMainTabs';
-import { AUTH_SET_TOKEN } from './actionTypes';
+import { AUTH_SET_TOKEN, REMOVE_AUTH_TOKEN } from './actionTypes';
 import { handleHttpError } from './errorHandlers';
+import App from '../../../App';
 
 const API_KEY = 'AIzaSyCK2rDlKTdc2NZpDXOmiIYfq1NLrL94hls';
 const GOOGLE_AUTH_ENDPOINT = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty';
@@ -87,7 +88,7 @@ export const authGetToken = () => (dispatch, getState) => {
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
                             },
-                            body: `grant_type=refesh_token&refresh_token=${refreshToken}`,
+                            body: `grant_type=refresh_token&refresh_token=${refreshToken}`,
                         })
                             .then((response) => handleHttpError(response, dispatch))
                             .then((response) => response.json())
@@ -106,7 +107,7 @@ export const authGetToken = () => (dispatch, getState) => {
                                 throw error;
                             });
                     } else {
-                        AsyncStorage.removeItem('ap:auth:tokenData');
+                        clearAsyncStorage();
                         reject();
                     }
                 });
@@ -138,3 +139,17 @@ export const tryAutoLogin = () => (dispatch) => {
             throw error;
         });
 };
+
+const clearAsyncStorage = () => AsyncStorage.removeItem('ap:auth:tokenData');
+
+export const logout = () => (dispatch) => {
+    clearAsyncStorage()
+        .then(() => {
+            App();
+        });
+    dispatch(removeAuthToken());
+};
+
+const removeAuthToken = () => ({
+    type: REMOVE_AUTH_TOKEN,
+});
