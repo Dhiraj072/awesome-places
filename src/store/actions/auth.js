@@ -58,20 +58,26 @@ export const authGetToken = () => (dispatch, getState) => {
             resolve(token);
         } else {
             AsyncStorage.getItem('ap:auth:tokenData')
-                .catch(() => reject())
+                .catch((error) => {
+                    reject();
+                    throw error;
+                })
                 .then((tokenData) => {
                     if (!tokenData) {
                         reject();
+                        return;
                     }
                     const now = new Date();
                     const parsedTokenData = JSON.parse(tokenData);
                     const storedToken = parsedTokenData.token;
-                    if (!storedToken ||
-                        now.getTime() > parsedTokenData.expiryAt) {
+                    if (storedToken &&
+                        parsedTokenData.expiryAt &&
+                        now.getTime() < parsedTokenData.expiryAt) {
+                        dispatch(authSetToken(storedToken));
+                        resolve(storedToken);
+                    } else {
                         reject();
                     }
-                    dispatch(authSetToken(storedToken));
-                    resolve(storedToken);
                 });
         }
     });
