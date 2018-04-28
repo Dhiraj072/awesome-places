@@ -60,6 +60,7 @@ export const addPlace = (place) => (dispatch) => {
                         .then((response) => response.json())
                         .then(() => {
                             dispatch(uiStopLoading());
+                            dispatch(getPlaces());
                         })
                         .catch((err) => handleError(err));
                 })

@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import ImagePicker from '../../components/ImagePicker/ImagePicker';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import { addPlace } from '../../store/actions/places';
-import Heading1 from '../../components/UI/Heading1/Heading1';
 import MainButton from '../../components/UI/MainButton/MainButton';
 import Input from '../../components/UI/Input';
 import validate from '../../utility/validation';
