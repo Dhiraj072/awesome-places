@@ -7,7 +7,7 @@ import MainText from '../../components/UI/MainText/MainText';
 import backgroundImage from '../../assets/background.jpg';
 import MainButton from '../../components/UI/MainButton/MainButton';
 import validate from '../../utility/validation';
-import { tryAuth } from '../../store/actions/index';
+import { tryAuth, tryAutoLogin } from '../../store/actions/index';
 
 class AuthScreen extends React.Component {
     state = {
@@ -42,6 +42,10 @@ class AuthScreen extends React.Component {
             },
         },
     };
+
+    componentWillMount() {
+        this.props.tryAutoLogin();
+    }
 
     componentDidMount() {
         Dimensions.addEventListener('change', this.onDimensionsUpdate);
@@ -182,6 +186,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     onTryAuth: (authData, authMode) => dispatch(tryAuth(authData, authMode)),
+    tryAutoLogin: () => dispatch(tryAutoLogin()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuthScreen);

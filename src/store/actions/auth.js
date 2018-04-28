@@ -1,3 +1,4 @@
+import { AsyncStorage } from 'react-native';
 import { uiStartLoading, uiStopLoading } from './ui';
 import startMainTabs from '../../screens/MainTabs/startMainTabs';
 import { AUTH_SET_TOKEN } from './actionTypes';
@@ -30,7 +31,10 @@ export const tryAuth = (authData, authMode) => (dispatch) => {
             if (!parsedResponse.idToken) {
                 alert(`Failed! ${parsedResponse.error.message}`);
             } else {
-                dispatch(authSetToken(parsedResponse.idToken));
+                dispatch(authStoreToken(
+                    parsedResponse.idToken,
+                    parsedResponse.expiresIn,
+                ));
                 startMainTabs();
             }
             dispatch(uiStopLoading());
@@ -50,11 +54,49 @@ export const authSetToken = (token) => ({
 export const authGetToken = () => (dispatch, getState) => {
     const token = getState().auth.token;
     const promise = new Promise((resolve, reject) => {
-        if (!token) {
-            reject();
-        } else {
+        if (token) {
             resolve(token);
+        } else {
+            AsyncStorage.getItem('ap:auth:tokenData')
+                .catch(() => reject())
+                .then((tokenData) => {
+                    if (!tokenData) {
+                        reject();
+                    }
+                    const now = new Date();
+                    const parsedTokenData = JSON.parse(tokenData);
+                    const storedToken = parsedTokenData.token;
+                    if (!storedToken ||
+                        now.getTime() > parsedTokenData.expiryAt) {
+                        reject();
+                    }
+                    dispatch(authSetToken(storedToken));
+                    resolve(storedToken);
+                });
         }
     });
     return promise;
+};
+
+export const authStoreToken = (token, expiresIn) => (dispatch) => {
+    dispatch(authSetToken(token));
+    const now = new Date();
+    const expiryAt = now.getTime() + (expiresIn * 1000);
+    const tokenData = {
+        token,
+        expiryAt,
+    };
+    AsyncStorage
+        .setItem('ap:auth:tokenData', JSON.stringify(tokenData))
+        .catch((error) => {
+            throw error;
+        });
+};
+
+export const tryAutoLogin = () => (dispatch) => {
+    dispatch(authGetToken())
+        .then(() => startMainTabs())
+        .catch((error) => {
+            throw error;
+        });
 };

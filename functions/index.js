@@ -11,17 +11,18 @@ const gcconfig = {
 const gcs = require('@google-cloud/storage')(gcconfig);
 
 admin.initializeApp({
-    credential: admin.credential.cert(require('./awesome-places'))
+    credential: admin.credential.cert(require('./awesome-places.json'))
 });
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
 exports.storeImage = functions.https.onRequest((request, response) => {
-    let idToken = request.headers.authorizationToken;
+    console.log('Firebase storing image');
+    let idToken = request.headers.authorization.split('Bearer ')[1];
+    console.log('Auth header and token', request.headers.authorization, idToken);    
     admin.auth().verifyIdToken(idToken)
     .then((token) => {
-        console.log('Firebase storing image');
         cors(request, response, () => {
             const body = JSON.parse(request.body);
             fs.writeFileSync(

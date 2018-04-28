@@ -21,6 +21,7 @@ const handleAuthError = (error) => {
 const checkAndHandleErrors = (response, dispatch) => {
     if (!response.ok) {
         dispatch(uiStopLoading());
+        console,log(response);
         alert(`Request rejected with status ${response.status}`);
         throw new Error('Error');
     } else {
@@ -32,8 +33,11 @@ const checkAndHandleErrors = (response, dispatch) => {
 // putting a catch at the end of a fetch/catch/then should handle them
 export const addPlace = (place) => (dispatch) => {
     dispatch(uiStartLoading());
+    let authToken;
     dispatch(authGetToken())
         .then((token) => {
+            authToken = token;
+            console.log('Got token', token, 'Now making storeImage req');
             fetch(
                 'https://us-central1-awesome-places-1523022274720.cloudfunctions.net/storeImage',
                 {
@@ -41,11 +45,15 @@ export const addPlace = (place) => (dispatch) => {
                     body: JSON.stringify({
                         image: place.image.base64,
                     }),
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 },
             )
                 .then((response) => checkAndHandleErrors(response, dispatch))
                 .then((response) => response.json())
                 .then((parsedResponse) => {
+                    console.log('Parsed res', parsedResponse);
                     const placeData = {
                         name: place.name,
                         location: place.location,
@@ -53,7 +61,8 @@ export const addPlace = (place) => (dispatch) => {
                             uri: parsedResponse.imageUrl,
                         },
                     };
-                    fetch('https://awesome-places-1523022274720.firebaseio.com/places.json', {
+                    fetch('https://awesome-places-1523022274720.firebaseio.com/' +
+                    `places.json?auth=${authToken}`, {
                         method: 'POST',
                         body: JSON.stringify(placeData),
                     })
