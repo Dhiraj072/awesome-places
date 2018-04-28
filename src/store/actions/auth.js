@@ -2,16 +2,19 @@ import { AsyncStorage } from 'react-native';
 import { uiStartLoading, uiStopLoading } from './ui';
 import startMainTabs from '../../screens/MainTabs/startMainTabs';
 import { AUTH_SET_TOKEN } from './actionTypes';
+import { handleHttpError } from './errorHandlers';
 
 const API_KEY = 'AIzaSyCK2rDlKTdc2NZpDXOmiIYfq1NLrL94hls';
+const GOOGLE_AUTH_ENDPOINT = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty';
+const REFRESH_TOKEN_ENDPOINT = `https://securetoken.googleapis.com/v1/token?key=${API_KEY}`;
 let AUTH_URL;
 
 // Login user. Sign up and then login for a new user
 export const tryAuth = (authData, authMode) => (dispatch) => {
     if (authMode === 'signup') {
-        AUTH_URL = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${API_KEY}`;
+        AUTH_URL = `${GOOGLE_AUTH_ENDPOINT}/signupNewUser?key=${API_KEY}`;
     } else if (authMode === 'login') {
-        AUTH_URL = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${API_KEY}`;
+        AUTH_URL = `${GOOGLE_AUTH_ENDPOINT}/verifyPassword?key=${API_KEY}`;
     } else {
         throw new Error('Unknown authMode ', authMode);
     }
@@ -26,14 +29,16 @@ export const tryAuth = (authData, authMode) => (dispatch) => {
             'Content-Type': 'application/json',
         },
     })
+        .then((response) => handleHttpError(response, dispatch))
         .then((response) => response.json())
         .then((parsedResponse) => {
             if (!parsedResponse.idToken) {
                 alert(`Failed! ${parsedResponse.error.message}`);
             } else {
-                dispatch(authStoreToken(
+                dispatch(storeToken(
                     parsedResponse.idToken,
                     parsedResponse.expiresIn,
+                    parsedResponse.refreshToken,
                 ));
                 startMainTabs();
             }
@@ -70,12 +75,38 @@ export const authGetToken = () => (dispatch, getState) => {
                     const now = new Date();
                     const parsedTokenData = JSON.parse(tokenData);
                     const storedToken = parsedTokenData.token;
+                    const refreshToken = parsedTokenData.refreshToken;
                     if (storedToken &&
                         parsedTokenData.expiryAt &&
-                        now.getTime() < parsedTokenData.expiryAt) {
+                        now.getTime() < parseInt(parsedTokenData.expiryAt, 10)) {
                         dispatch(authSetToken(storedToken));
                         resolve(storedToken);
+                    } else if (refreshToken) {
+                        fetch(REFRESH_TOKEN_ENDPOINT, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `grant_type=refesh_token&refresh_token=${refreshToken}`,
+                        })
+                            .then((response) => handleHttpError(response, dispatch))
+                            .then((response) => response.json())
+                            .then((parsedResponse) => {
+                                console.log('refresh', parsedResponse);
+                                dispatch(storeToken(
+                                    parsedResponse.id_token,
+                                    parsedResponse.expires_in,
+                                    parsedResponse.refresh_token,
+                                ));
+                                resolve(parsedResponse.id_token);
+                            })
+                            .catch((error) => {
+                                console.log('error refresh');
+                                reject();
+                                throw error;
+                            });
                     } else {
+                        AsyncStorage.removeItem('ap:auth:tokenData');
                         reject();
                     }
                 });
@@ -84,13 +115,14 @@ export const authGetToken = () => (dispatch, getState) => {
     return promise;
 };
 
-export const authStoreToken = (token, expiresIn) => (dispatch) => {
+const storeToken = (token, expiresIn, refreshToken) => (dispatch) => {
     dispatch(authSetToken(token));
     const now = new Date();
     const expiryAt = now.getTime() + (expiresIn * 1000);
     const tokenData = {
         token,
         expiryAt,
+        refreshToken,
     };
     AsyncStorage
         .setItem('ap:auth:tokenData', JSON.stringify(tokenData))

@@ -7,6 +7,7 @@ import {
 }
     from './actionTypes';
 import { uiStartLoading, uiStopLoading, authGetToken } from './index';
+import { handleHttpError } from './errorHandlers';
 
 const handleError = (error) => {
     alert('Something went wrong!');
@@ -16,17 +17,6 @@ const handleError = (error) => {
 const handleAuthError = (error) => {
     alert('Not logged in!');
     throw new Error('Not authenticated', error);
-};
-
-const checkAndHandleErrors = (response, dispatch) => {
-    if (!response.ok) {
-        dispatch(uiStopLoading());
-        console,log(response);
-        alert(`Request rejected with status ${response.status}`);
-        throw new Error('Error');
-    } else {
-        return response;
-    }
 };
 
 // TODO this does not handle 400/500 errors yet
@@ -50,7 +40,7 @@ export const addPlace = (place) => (dispatch) => {
                     },
                 },
             )
-                .then((response) => checkAndHandleErrors(response, dispatch))
+                .then((response) => handleHttpError(response, dispatch))
                 .then((response) => response.json())
                 .then((parsedResponse) => {
                     console.log('Parsed res', parsedResponse);
@@ -66,7 +56,7 @@ export const addPlace = (place) => (dispatch) => {
                         method: 'POST',
                         body: JSON.stringify(placeData),
                     })
-                        .then((response) => checkAndHandleErrors(response, dispatch))
+                        .then((response) => handleHttpError(response, dispatch))
                         .then((response) => response.json())
                         .then(() => {
                             dispatch(uiStopLoading());
@@ -89,7 +79,7 @@ export const deletePlace = (place) => (dispatch) => {
             `/places/${place.key}.json?auth=${token}`, {
                 method: 'DELETE',
             })
-                .then((response) => checkAndHandleErrors(response, dispatch))
+                .then((response) => handleHttpError(response, dispatch))
                 .then(() => {
                     dispatch({
                         type: DELETE_PLACE,
@@ -120,7 +110,7 @@ export const getPlaces = () => (dispatch) => {
         .then((token) => {
             fetch('https://awesome-places-1523022274720.firebaseio.com/' +
             `places.json?auth=${token}`)
-            // .then((response) => checkAndHandleErrors(response, dispatch))
+            // .then((response) => handleHttpError(response, dispatch))
                 .then((response) => response.json())
                 .then((parsedResponse) => {
                     const places = [];
