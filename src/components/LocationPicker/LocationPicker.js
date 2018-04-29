@@ -4,22 +4,8 @@ import MapView from 'react-native-maps';
 import MainButton from '../../components/UI/MainButton/MainButton';
 
 export default class LocationPicker extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            region: {
-                latitude: 37.795834,
-                longitude: -122.406418,
-                latitudeDelta: 0.0122,
-                longitudeDelta:
-                    (Dimensions.get('window').width /
-                    Dimensions.get('window').height) * 0.0122,
-            },
-            pickedLocation: {
-                latitude: '',
-                longitude: '',
-            },
-        };
+    componentWillMount() {
+        this.reset();
     }
     setPickedLocation = (coordinates) => {
         this.setState(() => ({
@@ -29,6 +15,22 @@ export default class LocationPicker extends React.Component {
             },
         }), () => {
             this.props.onLocationPick(this.state.pickedLocation);
+        });
+    };
+    reset = () => {
+        this.setState({
+            region: {
+                latitude: 37.795834,
+                longitude: -122.406418,
+                latitudeDelta: 0.0122,
+                longitudeDelta:
+                        (Dimensions.get('window').width /
+                            Dimensions.get('window').height) * 0.0122,
+            },
+            pickedLocation: {
+                latitude: '',
+                longitude: '',
+            },
         });
     };
     handleLocateMe = () => {

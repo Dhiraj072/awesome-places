@@ -22,51 +22,64 @@ const handleAuthError = (error) => {
 // TODO this does not handle 400/500 errors yet
 // putting a catch at the end of a fetch/catch/then should handle them
 export const addPlace = (place) => (dispatch) => {
-    dispatch(uiStartLoading());
-    let authToken;
-    dispatch(authGetToken())
-        .then((token) => {
-            authToken = token;
-            console.log('Got token', token, 'Now making storeImage req');
-            fetch(
-                'https://us-central1-awesome-places-1523022274720.cloudfunctions.net/storeImage',
-                {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        image: place.image.base64,
-                    }),
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                },
-            )
-                .then((response) => handleHttpError(response, dispatch))
-                .then((response) => response.json())
-                .then((parsedResponse) => {
-                    console.log('Parsed res', parsedResponse);
-                    const placeData = {
-                        name: place.name,
-                        location: place.location,
-                        image: {
-                            uri: parsedResponse.imageUrl,
-                        },
-                    };
-                    fetch('https://awesome-places-1523022274720.firebaseio.com/' +
-                    `places.json?auth=${authToken}`, {
+    return new Promise((resolve, reject) => {
+        dispatch(uiStartLoading());
+        let authToken;
+        dispatch(authGetToken())
+            .then((token) => {
+                authToken = token;
+                console.log('Got token', token, 'Now making storeImage req');
+                fetch(
+                    'https://us-central1-awesome-places-1523022274720.cloudfunctions.net/storeImage',
+                    {
                         method: 'POST',
-                        body: JSON.stringify(placeData),
-                    })
-                        .then((response) => handleHttpError(response, dispatch))
-                        .then((response) => response.json())
-                        .then(() => {
-                            dispatch(uiStopLoading());
-                            dispatch(getPlaces());
+                        body: JSON.stringify({
+                            image: place.image.base64,
+                        }),
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    },
+                )
+                    .then((response) => handleHttpError(response, dispatch))
+                    .then((response) => response.json())
+                    .then((parsedResponse) => {
+                        console.log('Parsed res', parsedResponse);
+                        const placeData = {
+                            name: place.name,
+                            location: place.location,
+                            image: {
+                                uri: parsedResponse.imageUrl,
+                            },
+                        };
+                        fetch('https://awesome-places-1523022274720.firebaseio.com/' +
+                        `places.json?auth=${authToken}`, {
+                            method: 'POST',
+                            body: JSON.stringify(placeData),
                         })
-                        .catch((err) => handleError(err));
-                })
-                .catch((err) => handleError(err));
-        })
-        .catch((error) => handleAuthError(error));
+                            .then((response) => handleHttpError(response, dispatch))
+                            .then((response) => response.json())
+                            .then((parsedRes) => {
+                                console.log('Place added res', parsedRes);
+                                dispatch(uiStopLoading());
+                                resolve(parsedRes);
+                                dispatch(getPlaces());
+                            })
+                            .catch((err) => {
+                                handleError(err);
+                                reject(err);
+                            });
+                    })
+                    .catch((err) => {
+                        handleError(err);
+                        reject(err);
+                    });
+            })
+            .catch((err) => {
+                handleAuthError(err);
+                reject(err);
+            });
+    });
 };
 
 export const deleteSelectedPlace = () => ({

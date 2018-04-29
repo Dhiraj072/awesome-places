@@ -17,24 +17,11 @@ class SharePlaceScreen extends React.Component {
         super(props);
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
     }
-    state = {
-        placeName: {
-            value: '',
-            valid: false,
-            validationRules: {
-                notEmpty: true,
-            },
-            touched: false,
-        },
-        placeLocation: {
-            value: null,
-            valid: false,
-        },
-        placeImage: {
-            value: null,
-            valid: false,
-        },
+
+    componentWillMount() {
+        this.setInitialState();
     }
+
     onNavigatorEvent = (event) => {
         if (event.type === 'NavBarButtonPress') {
             if (event.id === 'sideDrawer') {
@@ -43,7 +30,28 @@ class SharePlaceScreen extends React.Component {
                 });
             }
         }
-    }
+    };
+
+    setInitialState = () => {
+        this.setState({
+            placeName: {
+                value: '',
+                valid: false,
+                validationRules: {
+                    notEmpty: true,
+                },
+                touched: false,
+            },
+            placeLocation: {
+                value: null,
+                valid: false,
+            },
+            placeImage: {
+                value: null,
+                valid: false,
+            },
+        });
+    };
 
     placeNameChangedHandler = (placeName) => {
         this.setState((state) => ({
@@ -64,15 +72,13 @@ class SharePlaceScreen extends React.Component {
                 image: this.state.placeImage.value,
                 location: this.state.placeLocation.value,
             };
-            this.props.addPlace(place);
-            this.setState((state) => ({
-                placeName: {
-                    ...state.placeName,
-                    value: '',
-                    valid: false,
-                    touched: false,
-                },
-            }));
+            this.props.addPlace(place)
+                .then(() => {
+                    this.setInitialState();
+                    this.imagePicker.reset();
+                    this.locationPicker.reset();
+                    this.props.navigator.switchToTab({ tabIndex: 0 });
+                });
         }
     };
 
@@ -107,9 +113,12 @@ class SharePlaceScreen extends React.Component {
                     <View>
                         <ImagePicker
                             onImagePicked={this.handleImagePick}
+                            ref={(ref) => (this.imagePicker = ref)}
                         />
                         <LocationPicker
                             onLocationPick={this.handleLocationPick}
+                            ref={(ref) => (this.locationPicker = ref)}
+
                         />
                         <Input
                             placeHolder="Enter place name"

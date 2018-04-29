@@ -2,9 +2,11 @@ import React from 'react';
 import { Image, View, StyleSheet } from 'react-native';
 
 export default (props) => (
-    <View style={styles.container}>
-        <Image source={props.image} style={styles.image} />
-    </View>
+    props.image ? (
+        <View style={styles.container}>
+            <Image source={props.image} style={styles.image} />
+        </View>
+    ) : <View />
 );
 
 const styles = StyleSheet.create({

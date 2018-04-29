@@ -8,17 +8,23 @@ export default class ImagePicker extends React.Component {
     state = {
         pickedImage: null,
     };
+    reset = () => {
+        this.setState({
+            pickedImage: null,
+        });
+    }
     handleImagePick = () => {
         RNImagePicker.showImagePicker(
             {
                 title: 'Pick an image',
+                maxHeight: 600,
+                maxWidth: 800,
             },
             (res) => {
                 if (res.didCancel) {
                     // console.log('User cancelled');
                 } else if (res.error) {
-                    // TODO exception here?
-                    // console.log('error', res.error);
+                    throw res.error;
                 } else {
                     this.setState(() => ({
                         pickedImage: { uri: res.uri },
