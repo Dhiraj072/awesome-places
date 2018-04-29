@@ -51,6 +51,7 @@ export const addPlace = (place) => (dispatch) => {
                             image: {
                                 uri: parsedResponse.imageUrl,
                             },
+                            imagePath: parsedResponse.imagePath,
                         };
                         fetch('https://awesome-places-1523022274720.firebaseio.com/' +
                         `places.json?auth=${authToken}`, {

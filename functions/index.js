@@ -53,6 +53,7 @@ exports.storeImage = functions.https.onRequest((request, response) => {
                                     encodeURIComponent(file.name) +
                                     '?alt=media&token=' +
                                     id,
+                        imagePath: `/places/${id}.jpg`,
                     });
                 } else {
                     response.status(500).json({ error });
@@ -68,4 +69,15 @@ exports.storeImage = functions.https.onRequest((request, response) => {
         throw error;
     })
 });
+
+// TODO Make this work
+exports.deleteImage = functions.database
+    .ref('/places/{placeId}')
+    .onDelete((event) => {
+        console.log('event is ', event.ref().toJSON());
+        const placeData = event.ref().val();
+        const imagePath = placeData.imagePath;
+        const bucket = gcs.bucket('awesome-places-1523022274720.appspot.com');
+        return bucket.file(imagePath).delete();    
+})
 

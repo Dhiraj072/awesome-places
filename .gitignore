@@ -34,6 +34,7 @@ DerivedData
 project.xcworkspace
 
 # Android/IntelliJ
+android/app/awesome-places-key.keystore
 build/
 .idea
 .gradle
